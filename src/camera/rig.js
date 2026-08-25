@@ -97,12 +97,43 @@ export function createRig({ camera, frames, onWaypoint }) {
     window.scrollTo({ top: (clamped / stops) * max, behavior: 'smooth' })
   }
 
+  // --- Loop: scrolling past the last monitor resets to the wide shot --------
+  // The page snaps back to scrollTop 0 instantly; the scrub smoothing then
+  // rewinds the camera along the spline, which reads as a quick "loop back".
+  let loopLockUntil = 0
+  function resetLoop() {
+    // brief lockout so leftover wheel inertia doesn't immediately scroll
+    // back down after the jump
+    loopLockUntil = performance.now() + 900
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }
+
+  window.addEventListener(
+    'wheel',
+    (e) => {
+      // defaultPrevented: a focused screen is consuming this wheel to scroll
+      // its own content (see screens3d.js) — never loop out from under it
+      if (e.defaultPrevented || e.deltaY <= 0) return
+      if (performance.now() < loopLockUntil) {
+        e.preventDefault()
+        return
+      }
+      const max = document.documentElement.scrollHeight - innerHeight
+      if (window.scrollY >= max - 2) {
+        e.preventDefault()
+        resetLoop()
+      }
+    },
+    { passive: false }
+  )
+
   window.addEventListener('keydown', (e) => {
     if (e.target instanceof HTMLElement && /input|textarea/i.test(e.target.tagName)) return
     const nearest = Math.round(state.u * stops)
     if (['ArrowDown', 'ArrowRight', 'PageDown', ' '].includes(e.key)) {
       e.preventDefault()
-      scrollToStop(nearest + 1)
+      if (nearest >= stops) resetLoop()
+      else scrollToStop(nearest + 1)
     } else if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.key)) {
       e.preventDefault()
       scrollToStop(nearest - 1)

@@ -12,37 +12,96 @@ function esc(s) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
+// Lightweight syntax highlighter for the fake-editor snippets. Decorative,
+// not exhaustive: comments, strings, numbers, a shared keyword set, and
+// anything followed by "(" as a function call.
+const KEYWORDS = new Set(
+  (
+    'auto const return if else while for void bool true false new private public static final class ' +
+    'std string size_t double int float char using namespace ' +
+    'precision highp uniform varying sampler2d vec2 vec3 vec4 ' +
+    'create or replace function returns as declare begin end case when then elsif language ' +
+    'integer boolean text decimal default not and is'
+  ).split(' ')
+)
+
+function highlight(code, lang) {
+  const comment = lang === 'sql' ? '--[^\\n]*' : '\\/\\/[^\\n]*|\\/\\*[\\s\\S]*?\\*\\/'
+  const re = new RegExp(
+    `(${comment})` +
+      `|('(?:[^'\\\\\\n]|\\\\.)*'|"(?:[^"\\\\\\n]|\\\\.)*")` +
+      `|\\b(\\d+(?:\\.\\d+)?)\\b` +
+      `|\\b([A-Za-z_$][\\w$]*)\\b`,
+    'g'
+  )
+  let out = ''
+  let last = 0
+  let m
+  while ((m = re.exec(code))) {
+    out += esc(code.slice(last, m.index))
+    const s = m[0]
+    if (m[1]) out += `<span class="cm">${esc(s)}</span>`
+    else if (m[2]) out += `<span class="str">${esc(s)}</span>`
+    else if (m[3]) out += `<span class="num">${esc(s)}</span>`
+    else if (KEYWORDS.has(s.toLowerCase())) out += `<span class="kw">${esc(s)}</span>`
+    else if (code[m.index + s.length] === '(') out += `<span class="fn">${esc(s)}</span>`
+    else out += esc(s)
+    last = m.index + s.length
+  }
+  return out + esc(code.slice(last))
+}
+
 // Monitor 1 — featured project view for one project (`deco` carries the
-// shared label + code snippet dressing from content.featured)
+// shared label from content.featured). Content is taller than the screen;
+// the 3D layout scrolls it inside the monitor, the fallback shows it inline.
 export function buildFeatured(project, deco) {
   const root = el('div')
 
   root.appendChild(el('p', 'screen-label boot', esc(deco.label)))
   root.appendChild(el('h2', 'boot', esc(project.name)))
-  root.appendChild(el('p', 'desc boot', esc(project.description)))
+  if (project.role) root.appendChild(el('p', 'role boot', esc(project.role)))
+
+  const paras = Array.isArray(project.description) ? project.description : [project.description]
+  const descBlock = el('div', 'desc-block boot')
+  paras.forEach((p) => descBlock.appendChild(el('p', 'desc', esc(p))))
+  root.appendChild(descBlock)
 
   const tags = el('div', 'tags boot')
-  project.tech.forEach((t) => tags.appendChild(el('span', null, esc(t))))
+  ;(project.stack ?? project.tech).forEach((t) => tags.appendChild(el('span', null, esc(t))))
   root.appendChild(tags)
 
-  const editor = el('div', 'editor boot')
-  editor.appendChild(el('div', 'editor-bar', '<i></i><i></i><i></i>'))
-  const pre = el('pre')
-  const code = deco.snippet
-    .map((tok) => (tok.t === 'br' ? '\n' : `<span class="${tok.t}">${esc(tok.s)}</span>`))
-    .join('')
-  pre.innerHTML = code + '<span class="caret"></span>'
-  editor.appendChild(pre)
-  root.appendChild(editor)
+  if (project.snippet) {
+    const sn = project.snippet
+    if (sn.caption) root.appendChild(el('p', 'snippet-note boot', esc(sn.caption)))
+    const editor = el('div', 'editor boot')
+    const bar = el('div', 'editor-bar', '<i></i><i></i><i></i>')
+    bar.appendChild(el('span', 'editor-title', esc(sn.title)))
+    editor.appendChild(bar)
+    const pre = el('pre')
+    pre.innerHTML = highlight(sn.code, sn.lang) + '<span class="caret"></span>'
+    editor.appendChild(pre)
+    root.appendChild(editor)
+  }
 
-  const links = el('div', 'screen-links boot')
-  project.links.forEach(({ label, href }) => {
-    const a = el('a', null, esc(label) + ' ↗')
-    a.href = href
-    if (href.startsWith('http')) { a.target = '_blank'; a.rel = 'noreferrer' }
-    links.appendChild(a)
-  })
-  root.appendChild(links)
+  if (project.notes?.length) {
+    const notes = el('div', 'notes boot')
+    notes.appendChild(el('p', 'notes-label', 'Engineering notes'))
+    const ul = el('ul')
+    project.notes.forEach((n) => ul.appendChild(el('li', null, esc(n))))
+    notes.appendChild(ul)
+    root.appendChild(notes)
+  }
+
+  if (project.links?.length) {
+    const links = el('div', 'screen-links boot')
+    project.links.forEach(({ label, href }) => {
+      const a = el('a', null, esc(label) + ' ↗')
+      a.href = href
+      if (href.startsWith('http')) { a.target = '_blank'; a.rel = 'noreferrer' }
+      links.appendChild(a)
+    })
+    root.appendChild(links)
+  }
 
   return root
 }

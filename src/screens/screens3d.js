@@ -17,6 +17,7 @@ export function createScreens(cssScene, monitors, content) {
     screen?.classList.remove('active')
     requestAnimationFrame(() => {
       featuredMount.replaceChildren(buildFeatured(content.projects[i], content.featured))
+      featuredMount.parentElement.scrollTop = 0
       // re-adding .active next frame replays the boot-in stagger
       requestAnimationFrame(() => screen?.classList.add('active'))
     })
@@ -35,15 +36,38 @@ export function createScreens(cssScene, monitors, content) {
     const { cfg, normal } = monitor
     const elem = document.createElement('div')
     elem.className = `screen ${cfg.w > cfg.h ? 'landscape' : 'portrait'}`
-    elem.appendChild(roots[i])
+    const scroller = document.createElement('div')
+    scroller.className = 'screen-scroll'
+    scroller.appendChild(roots[i])
+    elem.appendChild(scroller)
 
     const obj = new CSS3DObject(elem)
     obj.position.set(...cfg.pos).addScaledVector(normal, 0.002)
     obj.rotation.y = cfg.rotY
     obj.scale.setScalar(1 / PX_PER_METER)
     cssScene.add(obj)
-    return { elem, focus: focusAt[i] }
+    return { elem, scroller, focus: focusAt[i] }
   })
+
+  // While a monitor is focused, the wheel scrolls the content inside its
+  // screen; the page (camera dolly) only takes over again once that content
+  // is at its top/bottom edge. Non-passive so we can preventDefault.
+  let activeScroller = null
+  window.addEventListener(
+    'wheel',
+    (e) => {
+      const sc = activeScroller
+      if (!sc) return
+      const delta = e.deltaMode === 1 ? e.deltaY * 32 : e.deltaY
+      const max = sc.scrollHeight - sc.clientHeight
+      if (max <= 0) return
+      if ((delta > 0 && sc.scrollTop < max - 1) || (delta < 0 && sc.scrollTop > 0)) {
+        e.preventDefault()
+        sc.scrollTop = Math.max(0, Math.min(max, sc.scrollTop + delta))
+      }
+    },
+    { passive: false }
+  )
 
   // Desk "powers on" shortly after load — staggered boot across the monitors
   screens.forEach(({ elem }, i) => {
@@ -54,6 +78,7 @@ export function createScreens(cssScene, monitors, content) {
     screens.forEach(({ elem, focus }) => {
       elem.classList.toggle('focus', focus === waypointIndex)
     })
+    activeScroller = screens.find((s) => s.focus === waypointIndex)?.scroller ?? null
     if (waypointIndex === 3) terminal.play?.()
   }
 
