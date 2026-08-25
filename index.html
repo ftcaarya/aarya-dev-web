@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aarya Raut — Software Engineer</title>
+    <meta name="description" content="Portfolio of Aarya Raut — software engineer. A 3D desk scene built from code." />
+    <meta property="og:title" content="Aarya Raut — Software Engineer" />
+    <meta property="og:description" content="A code-driven 3D portfolio. Scroll through the desk." />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>▮</text></svg>" />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <!-- 3D layers (filled by JS; empty in fallback mode) -->
+    <div id="webgl" aria-hidden="true"></div>
+    <div id="css3d" aria-hidden="false"></div>
+
+    <!-- Hero overlay (wide shot) -->
+    <header id="hero" class="hero">
+      <p class="hero-kicker">Portfolio</p>
+      <h1 class="hero-name">Aarya Raut</h1>
+      <p class="hero-title">Software Engineer</p>
+    </header>
+
+    <p id="cue" class="hero-cue" aria-hidden="true">
+      <span class="cue-line"></span> scroll
+    </p>
+
+    <!-- Waypoint dots -->
+    <nav id="dots" class="dots" aria-label="Scene navigation" hidden>
+      <button data-i="0" aria-label="Overview" class="on"></button>
+      <button data-i="1" aria-label="Featured project"></button>
+      <button data-i="2" aria-label="Projects"></button>
+      <button data-i="3" aria-label="About and contact"></button>
+    </nav>
+
+    <!-- Scroll track: gives the page its scrollable length -->
+    <div id="track" aria-hidden="true"></div>
+
+    <!-- Fallback / crawlable content mount -->
+    <main id="fallback" hidden></main>
+
+    <noscript>
+      <main class="noscript">
+        <h1>Aarya Raut — Software Engineer</h1>
+        <p>This portfolio needs JavaScript. Reach me at <a href="mailto:rautaarya23@gmail.com">rautaarya23@gmail.com</a>.</p>
+      </main>
+    </noscript>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
