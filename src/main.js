@@ -1,7 +1,11 @@
 import { content } from './content.js'
-import { shouldFallback, renderFallback } from './fallback.js'
+import { pickMode, renderFallback, renderMobile } from './fallback.js'
 
-if (shouldFallback()) {
+const mode = pickMode()
+
+if (mode === 'mobile') {
+  renderMobile(content)
+} else if (mode === 'flat') {
   renderFallback(content)
 } else {
   // Heavy 3D bundle is only fetched on capable desktops.

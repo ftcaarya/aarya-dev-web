@@ -438,6 +438,94 @@ body.fallback-mode #webgl, body.fallback-mode #css3d { display: none; }
 .noscript a { color: var(--ink); }
 
 /* ------------------------------------------------------------------------ */
+/* Mobile card (phones — 3D scene is never loaded)                           */
+/* ------------------------------------------------------------------------ */
+
+.mb-card {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 12vh 26px 8vh;
+}
+
+.mb-head h1 {
+  font-size: clamp(34px, 10vw, 46px);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.mb-role {
+  margin-top: 10px;
+  color: var(--ink-dim);
+  font-size: 15px;
+  letter-spacing: 0.06em;
+}
+
+.mb-note {
+  margin: 30px 0 44px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--accent-1);
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--ink-dim);
+}
+.mb-note strong { color: var(--ink); font-weight: 550; }
+
+.mb-projects { list-style: none; margin-top: 16px; }
+.mb-projects li {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+.mb-projects li:first-child { border-top: 1px solid var(--line); }
+.mb-proj-name { font-size: 18px; font-weight: 550; letter-spacing: -0.01em; }
+.mb-proj-line { font-size: 14px; line-height: 1.5; color: #b9b7ae; }
+.mb-proj-tech {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-dim);
+}
+
+.mb-contact { display: flex; flex-direction: column; margin-top: 40px; }
+.mb-contact a {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  /* 52px tap target — comfortably above the 44px minimum */
+  padding: 16px 2px;
+  min-height: 52px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  text-decoration: none;
+}
+.mb-contact a:first-child { border-top: 1px solid var(--line); }
+.mb-link-label {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-3);
+}
+.mb-link-mono {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink-dim);
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+body.mobile-mode .fb-footer { padding-top: 8px; }
+
+@media (max-width: 360px) {
+  .mb-card { padding: 9vh 20px 6vh; }
+  .mb-link-mono { font-size: 12px; }
+}
+
+/* ------------------------------------------------------------------------ */
 /* Reduced motion                                                            */
 /* ------------------------------------------------------------------------ */
 
