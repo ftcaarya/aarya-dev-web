@@ -128,5 +128,5 @@ export function createRig({ camera, frames, onWaypoint }) {
   }
 
   apply()
-  return { apply, setDot }
+  return { apply, setDot, scrollToStop }
 }

@@ -17,7 +17,10 @@ export function startExperience(content) {
   const monitors = MONITORS.map(createMonitor)
   monitors.forEach((m) => world.scene.add(m.group))
 
-  const screens = createScreens(world.cssScene, monitors, content)
+  // Selecting a project flies the camera back to the featured (left) monitor
+  // so the updated description is actually seen. `rig` is assigned below but
+  // exists by the time a click can happen.
+  const screens = createScreens(world.cssScene, monitors, content, () => rig?.scrollToStop(1))
 
   // Camera framing targets: one per monitor
   const frames = monitors.map(({ cfg, normal }) => ({

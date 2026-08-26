@@ -5,7 +5,9 @@ import { buildFeatured, buildProjects, buildTerminal } from './dom.js'
 // Wraps the shared DOM builders in CSS3DObjects positioned exactly on the
 // monitor screen surfaces. Returns setActive(waypointIndex) which drives the
 // boot-in / typing animations (waypoint 0 is the wide shot; monitors are 1–3).
-export function createScreens(cssScene, monitors, content) {
+// `onProjectSelect` fires when a project row is clicked, after the featured
+// screen has been swapped — the rig uses it to fly back to that monitor.
+export function createScreens(cssScene, monitors, content, onProjectSelect) {
   const terminal = buildTerminal(content.about, { animate: true })
 
   // Featured screen mirrors the project selected on the projects screen.
@@ -21,6 +23,9 @@ export function createScreens(cssScene, monitors, content) {
       // re-adding .active next frame replays the boot-in stagger
       requestAnimationFrame(() => screen?.classList.add('active'))
     })
+    // brief pause so the click's row highlight registers before the camera
+    // flies back to the featured monitor to show the new description
+    setTimeout(() => onProjectSelect?.(), 450)
   }
 
   const roots = [
