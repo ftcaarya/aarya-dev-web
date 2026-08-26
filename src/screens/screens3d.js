@@ -25,7 +25,7 @@ export function createScreens(cssScene, monitors, content, onProjectSelect) {
     })
     // brief pause so the click's row highlight registers before the camera
     // flies back to the featured monitor to show the new description
-    setTimeout(() => onProjectSelect?.(), 450)
+    setTimeout(() => onProjectSelect?.(), 100)
   }
 
   const roots = [
