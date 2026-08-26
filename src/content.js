@@ -30,18 +30,18 @@ export const content = {
       role: 'Co-Founder & Lead Engineer · AR Smart Glasses',
       line: 'AR smart glasses — AI fully on-device',
       description: [
-        'Halion is an AR smart-glasses platform I co-founded, built around a ' +
+        'Halion Technologies LLC is a startup I co-founded building AR smart glasses. ' +
+          'HalOS is the custom operating system I built for them. ' +
           'simple idea: glasses that remember things for you and let you ask ' +
-          'them questions, with everything running locally on the device — no ' +
+          'them questions, with everything running locally on the device. No ' +
           'phone, no cloud, no internet dependency. I built the application ' +
           'layer end-to-end and led the (in-progress) effort to replace its ' +
           'stock Linux base with a custom-built OS.',
-        'The shipping demo — built for AWE 2026 and later formalized into a ' +
-          'spec sheet for Samsung — runs entirely on an Orange Pi 5 with a ' +
+        'The shipping demo — built for AWE 2026 runs entirely on an Orange Pi 5 with a ' +
           'hard 4GB RAM ceiling. A USB camera feeds a custom-trained YOLOv8 ' +
           'model (ONNX Runtime) that tracks everyday objects like a wallet ' +
           'and remembers where they were last seen. A local LLM ' +
-          '(Qwen2.5-1.5B via llama.cpp) answers questions and manages a ' +
+          '(via llama.cpp) answers questions and manages a ' +
           'persistent to-do list and calendar, all rendered as a see-through ' +
           'HUD directly on the framebuffer. Detection, inference, and ' +
           'rendering all run on-device in real time with no cloud fallback.',
@@ -106,9 +106,9 @@ export const content = {
         title: 'LiquidEther.tsx — advection fragment shader',
         lang: 'glsl',
         caption:
-          "The site's background isn't a canned particle effect — it's a real " +
-          'incompressible-fluid solver built directly on Three.js primitives, ' +
-          'including BFECC (back-and-forth error compensation) advection to ' +
+          "The site's background is a real incompressible-fluid solver " +
+          'built directly on Three.js primitives, including BFECC ' +
+          '(back-and-forth error compensation) advection to ' +
           'cancel the first-order error a naive semi-Lagrangian velocity step ' +
           'would introduce.',
         code: `precision highp float;
@@ -150,11 +150,11 @@ void main(){
       line: 'Daily ranked quiz with a chess-style ELO',
       description: [
         'A daily ranked quiz platform that helps FIRST Tech Challenge ' +
-          'robotics students study a dense competition rules manual — turning ' +
+          'robotics students study a dense competition rules manual, turning ' +
           'memorization into a game with a chess-style ELO rating, daily ' +
           'ranked matches, and untimed practice mode. Teams authenticate ' +
           'against their real FTC team number (looked up via the FTCScout ' +
-          'API), and the app has been adopted by FTC teams beyond just my own.',
+          'API), and the app has been adopted by FTC teams all around the world.',
       ],
       tech: ['Next.js', 'PostgreSQL', 'PL/pgSQL'],
       stack: [
@@ -224,10 +224,10 @@ $$ LANGUAGE plpgsql;`,
       role: 'Robotics Programmer · 2025–2026 FTC Season',
       line: 'Vision-corrected robot control software',
       description: [
-        'I lead programming for Cybotz, our competitive FIRST Tech Challenge ' +
+        'I lead programming for Cybotz, a competitive FIRST Tech Challenge ' +
           'robotics team, writing the Java control software that runs the ' +
           'robot in both autonomous and driver-controlled modes. This is ' +
-          'where my interest in low-level systems work actually started — ' +
+          'where my interest in low-level systems work is shown: ' +
           'sensor fusion, real-time control loops, and hardware that has to ' +
           'work correctly on the first try in a 30-second autonomous window ' +
           'with no do-overs.',
