@@ -65,37 +65,55 @@ const TAB_ICONS = {
 }
 
 // Photo/video grid for the Gallery tab. Items are { src, caption? }; files
-// live in public/gallery/<project>/. Videos play muted on loop since the 3D
-// layer doesn't take pointer input on them; images open full size on click.
+// live in public/gallery/<project>/. Media only loads the first time the tab
+// is opened, and videos (muted, looping) only play while it's visible. Every
+// item is wrapped in a link since the 3D layer only takes clicks on a/button.
 function buildGallery(items) {
   const pane = el('div', 'tab-pane')
+  pane.setVisible = () => {}
   if (!items.length) {
     pane.appendChild(el('p', 'gallery-empty', 'Photos coming soon.'))
     return pane
   }
   const grid = el('div', 'gallery')
+  const media = []
   items.forEach(({ src, caption }) => {
     const fig = el('figure')
-    if (/\.(mp4|webm|mov)$/i.test(src)) {
-      const video = el('video')
-      Object.assign(video, { src, muted: true, loop: true, autoplay: true, playsInline: true })
-      fig.appendChild(video)
+    const a = el('a')
+    a.href = src
+    a.target = '_blank'
+    a.rel = 'noreferrer'
+    const isVideo = /\.(mp4|webm|mov)$/i.test(src)
+    const m = el(isVideo ? 'video' : 'img')
+    if (isVideo) {
+      Object.assign(m, { muted: true, loop: true, playsInline: true, preload: 'none' })
+      // stop decoding once the featured screen swaps to another project
+      m.addEventListener('timeupdate', () => { if (!m.isConnected) m.pause() })
+      a.classList.add('is-video')
     } else {
-      const a = el('a')
-      a.href = src
-      a.target = '_blank'
-      a.rel = 'noreferrer'
-      const img = el('img')
-      img.src = src
-      img.alt = caption ?? ''
-      img.decoding = 'async'
-      a.appendChild(img)
-      fig.appendChild(a)
+      m.alt = caption ?? ''
+      m.decoding = 'async'
     }
+    media.push([m, src])
+    a.appendChild(m)
+    fig.appendChild(a)
     if (caption) fig.appendChild(el('figcaption', null, esc(caption)))
     grid.appendChild(fig)
   })
   pane.appendChild(grid)
+
+  let loaded = false
+  pane.setVisible = (on) => {
+    if (on && !loaded) {
+      loaded = true
+      media.forEach(([m, src]) => { m.src = src })
+    }
+    media.forEach(([m]) => {
+      if (m.tagName !== 'VIDEO') return
+      if (on) m.play().catch(() => {})
+      else m.pause()
+    })
+  }
   return pane
 }
 
@@ -121,6 +139,7 @@ export function buildFeatured(project, deco) {
       tab.addEventListener('click', () => {
         tabs.querySelectorAll('.tab').forEach((t) => t.classList.toggle('on', t === tab))
         Object.entries(panes).forEach(([k, pane]) => { pane.hidden = k !== key })
+        panes.gallery.setVisible(key === 'gallery')
         root.closest('.screen-scroll')?.scrollTo(0, 0)
       })
       tab.classList.toggle('on', i === 0)

@@ -60,92 +60,17 @@ export const content = {
         },
       ],
       gallery: [
-        // { src: '/gallery/halion/awe-booth.jpg', caption: 'AWE 2026 demo booth' },
-      ],
-    },
-    {
-      name: 'AKTSA Showcase Platform',
-      role: 'Full-Stack Developer',
-      line: 'Conference submission & grading platform',
-      description: [
-        "A production web platform I built to run our regional TSA (Technology " +
-          "Student Association) conference's project submission and grading " +
-          'pipeline for hundreds of participants — replacing what had ' +
-          'previously been done by hand over spreadsheets and email. Three ' +
-          'user roles (competing teams, event officers, and admins) share one ' +
-          'platform: teams submit project links, officers score submissions ' +
-          'scoped to their assigned events, and admins manage accounts and ' +
-          'chapter-wide configuration.',
-      ],
-      tech: ['Next.js', 'Supabase', 'Three.js'],
-      stack: [
-        'Next.js 16', 'React 18', 'TypeScript', 'Tailwind + shadcn/ui',
-        'Supabase (PostgreSQL)', 'JWT auth (jose + bcryptjs)',
-        'Upstash Redis', 'Three.js',
-      ],
-      notes: [
-        'Built role-based authorization (teams / officers / admins) entirely at the API layer using a service-role Supabase client — bypassing RLS meant authorization had to be enforced deliberately in application code',
-        'Added production-grade resilience most projects this size skip: structured logging, request timing, retry/timeout handling, and a circuit breaker across every API route',
-        "Implemented sliding-window rate limiting (Upstash Redis) that degrades gracefully to open in local development when Redis isn't configured",
-      ],
-      links: [],
-    },
-    {
-      name: 'FTC Quiz Clash',
-      role: 'Full-Stack Developer · Adopted by FTC teams internationally',
-      line: 'Daily ranked quiz with a chess-style ELO',
-      description: [
-        'A daily ranked quiz platform that helps FIRST Tech Challenge ' +
-          'robotics students study a dense competition rules manual, turning ' +
-          'memorization into a game with a chess-style ELO rating, daily ' +
-          'ranked matches, and untimed practice mode. Teams authenticate ' +
-          'against their real FTC team number (looked up via the FTCScout ' +
-          'API), and the app has been adopted by FTC teams all around the world.',
-      ],
-      tech: ['Next.js', 'PostgreSQL', 'PL/pgSQL'],
-      stack: [
-        'Next.js 14', 'React 18', 'TypeScript',
-        'Supabase (PostgreSQL + Auth + RLS)', 'PL/pgSQL', 'Framer Motion',
-        'FTCScout API',
-      ],
-      notes: [
-        'Designed the daily ranked quiz to be fair and non-repeating: the same 10 questions are lazily generated for every student on a given day and excluded from the prior 7 days, while practice mode shuffles freely',
-        'Found and fixed a production data-consistency bug where a client-visible ELO rating diverged from the correctly-updated peak rating due to a multi-step write sequencing issue — diagnosed the root cause and reconciled the data',
-        'Built a rate-limited team-lookup sync pipeline against the FTCScout API (single-team queries only, no bulk export) running persistently on a Raspberry Pi',
-      ],
-      links: [{ label: 'Live', href: 'https://challenge.cybotzrobotics.org' }],
-    },
-    {
-      name: 'Cybotz Robotics — DECODE',
-      role: 'Robotics Programmer · 2025–2026 FTC Season',
-      line: 'Vision-corrected robot control software',
-      description: [
-        'I lead programming for Cybotz, a competitive FIRST Tech Challenge ' +
-          'robotics team, writing the Java control software that runs the ' +
-          'robot in both autonomous and driver-controlled modes. This is ' +
-          'where my interest in low-level systems work is shown: ' +
-          'sensor fusion, real-time control loops, and hardware that has to ' +
-          'work correctly on the first try in a 30-second autonomous window ' +
-          'with no do-overs.',
-        'The DECODE-season robot detects a game pattern, drives a multi-stage ' +
-          'scoring path, and fires game pieces into a goal using ' +
-          'vision-corrected closed-loop targeting — fusing a Limelight smart ' +
-          'camera with wheel odometry so the robot can still aim accurately ' +
-          'even when it temporarily loses sight of the target.',
-      ],
-      tech: ['Java', 'Computer Vision', 'Control Systems'],
-      stack: [
-        'Java', 'FTC SDK', 'Pedro Pathing', 'FTCLib/SolversLib PID',
-        'Limelight 3A', 'goBILDA Pinpoint odometry', 'FTC Dashboard',
-      ],
-      notes: [
-        'Built a dual vision-tracking strategy (SDK AprilTag pipeline vs. Limelight) and benchmarked both before standardizing on the Limelight path for its simpler onboard distance/bearing output',
-        'Designed the autonomous routine as a state machine (not a linear script) so the robot can react to real-world timing variance mid-match — e.g. breaking off intake early if a sensor reports the sorter is full',
-        '~8,850 lines of custom Java, running entirely on a single onboard control computer with no server or backend',
-      ],
-      links: [],
-      gallery: [
-        // { src: '/gallery/cybotz/robot.jpg', caption: 'DECODE robot' },
+        // add a caption with { src, caption: '…' }
+        { src: '/gallery/halion/halion-01.jpg' },
+        { src: '/gallery/halion/halion-02.jpg' },
+        { src: '/gallery/halion/halion-03.jpg' },
+        { src: '/gallery/halion/halion-04.jpg' },
+        { src: '/gallery/halion/halion-05.jpg' },
+        { src: '/gallery/halion/halion-06.jpg' },
+        { src: '/gallery/halion/halion-07.jpg' },
+        { src: '/gallery/halion/halion-08.jpg' },
+        { src: '/gallery/halion/halion-09.jpg' },
+        { src: '/gallery/halion/halion-10.jpg' },
       ],
     },
     {
@@ -184,6 +109,173 @@ export const content = {
         { label: 'EarlyPulse', href: 'https://earlypulse.org' },
         { label: 'Email', href: 'mailto:rautaarya23@gmail.com' },
       ],
+    },
+    {
+      name: 'FTC Programming',
+      role: 'Lead Programmer · 4 FIRST Tech Challenge seasons · 3 teams',
+      line: 'Control, localization & pathing for competition robots',
+      description: [
+        "I've been lead programmer for four FIRST Tech Challenge seasons " +
+          'across three teams: Version Vegaz (23241) for CENTERSTAGE, Circuit ' +
+          'Breakers (21829) for INTO THE DEEP, and Cybotz (21351) for DECODE. ' +
+          "I rejoined Circuit Breakers to compete at the Carolinas FIRST " +
+          "Premier Event and am with them for this season's BioBuzz. Every season " +
+          'is a new robot and a new game, and the Java control software has ' +
+          'to work the first time in a 30-second autonomous with no do-overs.',
+        'Most of my work is control and localization. I tune PIDF loops ' +
+          'with gravity feedforward on arms, lifts, and slides, run flywheels ' +
+          'on PIDF and bang-bang velocity control, and auto-track turrets, ' +
+          "all tuned live through FTC Dashboard. I've run three-wheel and " +
+          'two-wheel dead-wheel odometry, goBILDA Pinpoint, and SparkFun ' +
+          'OTOS, and I heavily customized Road Runner\'s internals to get our ' +
+          'robot following paths extremely accurately.',
+        'In the off-season after INTO THE DEEP I wrote my own pure pursuit ' +
+          'path follower from the published papers, then added a Kalman ' +
+          'filter to cut the noise out of the pose estimate. For DECODE the ' +
+          'robot fused a Limelight camera with wheel odometry for ' +
+          'vision-corrected closed-loop targeting, so it kept aiming ' +
+          'accurately even when it briefly lost sight of the goal.',
+      ],
+      tech: ['Java', 'Control Systems', 'Localization'],
+      stack: [
+        'Java', 'FTC SDK', 'Road Runner (customized)', 'Pedro Pathing',
+        'Pure pursuit (from scratch)', 'Kalman filter', 'PIDF + feedforward',
+        'goBILDA Pinpoint', 'SparkFun OTOS', 'Limelight 3A', 'FTC Dashboard',
+      ],
+      notes: [
+        'CENTERSTAGE (Version Vegaz): Control Award, given for the best use of sensors and software, at the Raleigh qualifier, plus alliance finalist',
+        'INTO THE DEEP (Circuit Breakers): undefeated 5–0 #1 seed and winning alliance at the Salem Academy qualifier, Inspire Award at Pinnacle Classical, 5th at the NC Championship, and top 7% of 7,600+ teams worldwide by OPR',
+        'DECODE (Cybotz): Think Award at the NC Championship, Inspire Award at the TMSA qualifier, and alliance finalist at Southeast Guilford',
+        'Carolinas Premier Event (Circuit Breakers, July 2026): qualified for and competed at a FIRST Premier Event against 34 teams, and earned the 2nd-place Inspire Award',
+        'Built a dual vision-tracking strategy (SDK AprilTag pipeline vs. Limelight) and benchmarked both before standardizing on the Limelight path for its simpler onboard distance/bearing output',
+        'Designed the DECODE autonomous as a state machine (not a linear script) so the robot can react to real-world timing variance mid-match — e.g. breaking off intake early if a sensor reports the sorter is full',
+        'DECODE codebase: ~8,850 lines of custom Java, running entirely on a single onboard control computer with no server or backend',
+        'Wrote the programming docs and built code.cb21829.org so new team members can get up to speed',
+      ],
+      links: [
+        { label: 'Team site', href: 'https://cb21829.org' },
+        { label: 'Code', href: 'https://code.cb21829.org' },
+        { label: 'Docs', href: 'https://docs.cb21829.org' },
+      ],
+      gallery: [
+        // add a caption with { src, caption: '…' }
+        { src: '/gallery/ftc/ftc-01.jpg' },
+        { src: '/gallery/ftc/ftc-02.jpg' },
+        { src: '/gallery/ftc/ftc-03.jpg' },
+        { src: '/gallery/ftc/ftc-04.jpg' },
+        { src: '/gallery/ftc/ftc-05.jpg' },
+        { src: '/gallery/ftc/ftc-06.jpg' },
+        { src: '/gallery/ftc/ftc-07.jpg' },
+        { src: '/gallery/ftc/ftc-08.jpg' },
+        { src: '/gallery/ftc/ftc-09.jpg' },
+        { src: '/gallery/ftc/ftc-10.jpg' },
+        { src: '/gallery/ftc/ftc-11.jpg' },
+        { src: '/gallery/ftc/ftc-12.jpg' },
+        { src: '/gallery/ftc/ftc-13.jpg' },
+        { src: '/gallery/ftc/ftc-video-01.mp4' },
+        { src: '/gallery/ftc/ftc-video-02.mp4' },
+        { src: '/gallery/ftc/ftc-video-03.mp4' },
+        { src: '/gallery/ftc/ftc-video-04.mp4' },
+        { src: '/gallery/ftc/ftc-video-05.mp4' },
+      ],
+    },
+    {
+      name: 'AKTSA Showcase Platform',
+      role: 'Full-Stack Developer',
+      line: 'Conference submission & grading platform',
+      description: [
+        "A production platform that runs our regional TSA (Technology " +
+          "Student Association) conference's project submission and grading " +
+          'pipeline for hundreds of participants, replacing spreadsheets and ' +
+          'email. Built on the Next.js 16 App Router with TypeScript and ' +
+          'Supabase Postgres, it serves three roles: teams submit projects, ' +
+          'event officers score submissions scoped to their assigned events, ' +
+          'and admins manage accounts and chapter-wide configuration.',
+        'Auth is custom: bcrypt-hashed credentials and signed JWTs (jose), ' +
+          'with role-based authorization enforced at the API layer because ' +
+          'the server talks to Postgres through a service-role client that ' +
+          'bypasses row-level security. Every route is wrapped in structured ' +
+          'logging, request timing, retry/timeout handling, and a circuit ' +
+          'breaker, behind sliding-window rate limiting on Upstash Redis.',
+        "The background is a real-time incompressible fluid solver built " +
+          'directly on Three.js primitives, using BFECC (back-and-forth error ' +
+          'compensation) advection to cancel the first-order error of a ' +
+          'naive semi-Lagrangian step.',
+      ],
+      tech: ['Next.js', 'Supabase', 'Three.js'],
+      stack: [
+        'Next.js 16', 'React 18', 'TypeScript', 'Tailwind + shadcn/ui',
+        'Supabase (PostgreSQL)', 'JWT auth (jose + bcryptjs)',
+        'Upstash Redis', 'Three.js',
+      ],
+      notes: [
+        'Built role-based authorization (teams / officers / admins) entirely at the API layer using a service-role Supabase client — bypassing RLS meant authorization had to be enforced deliberately in application code',
+        'Added production-grade resilience most projects this size skip: structured logging, request timing, retry/timeout handling, and a circuit breaker across every API route',
+        "Implemented sliding-window rate limiting (Upstash Redis) that degrades gracefully to open in local development when Redis isn't configured",
+      ],
+      links: [],
+    },
+    {
+      name: 'FTC Quiz Clash',
+      role: 'Full-Stack Developer · Adopted by FTC teams internationally',
+      line: 'Daily ranked quiz with a chess-style ELO',
+      description: [
+        'A daily ranked quiz platform that helps FIRST Tech Challenge ' +
+          'students master a dense competition rules manual, adopted by FTC ' +
+          'teams around the world. Students compete in daily ranked matches ' +
+          'on a chess-style ELO ladder or train in an untimed practice mode, ' +
+          'and sign in against their real FTC team number, verified through ' +
+          'the FTCScout API.',
+        'The rating engine lives in the database: a pure PL/pgSQL function ' +
+          'computes every ELO change with difficulty-weighted K-factors, ' +
+          'diminishing returns above 1500 and 1800, and a floor that rules out ' +
+          'zero-change results, so client and server can never disagree. ' +
+          'Supabase Auth and Postgres row-level security guard the data, and ' +
+          'the Next.js 14 front end is written in TypeScript with Framer ' +
+          'Motion.',
+      ],
+      tech: ['Next.js', 'PostgreSQL', 'PL/pgSQL'],
+      stack: [
+        'Next.js 14', 'React 18', 'TypeScript',
+        'Supabase (PostgreSQL + Auth + RLS)', 'PL/pgSQL', 'Framer Motion',
+        'FTCScout API',
+      ],
+      notes: [
+        'Designed the daily ranked quiz to be fair and non-repeating: the same 10 questions are lazily generated for every student on a given day and excluded from the prior 7 days, while practice mode shuffles freely',
+        'Found and fixed a production data-consistency bug where a client-visible ELO rating diverged from the correctly-updated peak rating due to a multi-step write sequencing issue — diagnosed the root cause and reconciled the data',
+        'Built a rate-limited team-lookup sync pipeline against the FTCScout API (single-team queries only, no bulk export) running persistently on a Raspberry Pi',
+      ],
+      links: [{ label: 'Live', href: 'https://challenge.cybotzrobotics.org' }],
+    },
+    {
+      name: 'FBLA Elevate',
+      role: 'Freelance Developer · Built for founder Shourya Bangaru',
+      line: 'Competition prep platform for FBLA events',
+      description: [
+        'An all-in-one prep platform for Future Business Leaders of America ' +
+          'competitive events, built to replace the outdated, low-quality ' +
+          'study materials most students rely on. Students drill objective-' +
+          'test questions with explanations and study with flashcards and ' +
+          'guided practice sessions, with AI roleplay practice for the ' +
+          'roleplay events in progress.',
+        'The question bank holds ~10,000 questions covering every FBLA ' +
+          'event, fed by an automated ingestion pipeline: a scraper running ' +
+          'unattended on a Raspberry Pi Zero 2 W collects the questions, ' +
+          'normalizes them, and inserts them straight into the Supabase ' +
+          'Postgres database. The app itself is Next.js and TypeScript on ' +
+          'Vercel, with Supabase handling auth and data.',
+      ],
+      tech: ['Next.js', 'Supabase', 'Raspberry Pi'],
+      stack: [
+        'Next.js', 'TypeScript', 'Supabase (PostgreSQL + Auth)', 'Vercel',
+        'Raspberry Pi Zero 2 W',
+      ],
+      notes: [
+        'Built a scraper-to-database pipeline on a Raspberry Pi Zero 2 W that collects questions and inserts them into Postgres automatically, growing the bank to ~10,000 questions with no manual data entry',
+        'Covers every FBLA competitive event, so one platform replaces a scattered set of outdated study resources',
+        'Freelance build for the founder, from the question pipeline through the student-facing app',
+      ],
+      links: [{ label: 'Live', href: 'https://fbla-elevate.com' }],
     },
     {
       name: 'Security & Systems',

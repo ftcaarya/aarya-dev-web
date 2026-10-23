@@ -334,7 +334,18 @@ body.fallback-mode #webgl, body.fallback-mode #css3d { display: none; }
   padding-bottom: 8px;
 }
 .gallery figure { min-width: 0; }
-.gallery a { display: block; }
+.gallery a { display: block; position: relative; }
+.gallery a.is-video::after {
+  content: '▶';
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  padding: 4px 9px 4px 11px;
+  font-size: 13px;
+  color: var(--ink);
+  background: rgba(10, 10, 13, 0.7);
+  border-radius: 6px;
+}
 .gallery img, .gallery video {
   display: block;
   width: 100%;
