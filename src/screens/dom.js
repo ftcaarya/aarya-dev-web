@@ -51,6 +51,54 @@ function highlight(code, lang) {
   return out + esc(code.slice(last))
 }
 
+function linkEl(href, html, className) {
+  const a = el('a', className, html)
+  a.href = href
+  if (href.startsWith('http')) { a.target = '_blank'; a.rel = 'noreferrer' }
+  return a
+}
+
+// Small inline icons for the featured-screen tabs
+const TAB_ICONS = {
+  description: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3.5h10M3 6.5h10M3 9.5h10M3 12.5h6" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>',
+  gallery: '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4" fill="none"/><circle cx="6" cy="6.5" r="1.2" fill="currentColor"/><path d="M2.5 12l3.5-3.5 2.5 2.5 2-2 3 3" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/></svg>',
+}
+
+// Photo/video grid for the Gallery tab. Items are { src, caption? }; files
+// live in public/gallery/<project>/. Videos play muted on loop since the 3D
+// layer doesn't take pointer input on them; images open full size on click.
+function buildGallery(items) {
+  const pane = el('div', 'tab-pane')
+  if (!items.length) {
+    pane.appendChild(el('p', 'gallery-empty', 'Photos coming soon.'))
+    return pane
+  }
+  const grid = el('div', 'gallery')
+  items.forEach(({ src, caption }) => {
+    const fig = el('figure')
+    if (/\.(mp4|webm|mov)$/i.test(src)) {
+      const video = el('video')
+      Object.assign(video, { src, muted: true, loop: true, autoplay: true, playsInline: true })
+      fig.appendChild(video)
+    } else {
+      const a = el('a')
+      a.href = src
+      a.target = '_blank'
+      a.rel = 'noreferrer'
+      const img = el('img')
+      img.src = src
+      img.alt = caption ?? ''
+      img.decoding = 'async'
+      a.appendChild(img)
+      fig.appendChild(a)
+    }
+    if (caption) fig.appendChild(el('figcaption', null, esc(caption)))
+    grid.appendChild(fig)
+  })
+  pane.appendChild(grid)
+  return pane
+}
+
 // Monitor 1 — featured project view for one project (`deco` carries the
 // shared label from content.featured). Content is taller than the screen;
 // the 3D layout scrolls it inside the monitor, the fallback shows it inline.
@@ -61,18 +109,42 @@ export function buildFeatured(project, deco) {
   root.appendChild(el('h2', 'boot', esc(project.name)))
   if (project.role) root.appendChild(el('p', 'role boot', esc(project.role)))
 
+  // Projects with a `gallery` get Description / Gallery tabs; everything
+  // below the header goes into the description pane.
+  let body = root
+  if (project.gallery) {
+    const panes = { description: el('div', 'tab-pane'), gallery: buildGallery(project.gallery) }
+    const tabs = el('div', 'tabs boot')
+    Object.keys(panes).forEach((key, i) => {
+      const tab = el('button', 'tab', TAB_ICONS[key] + `<span>${key[0].toUpperCase() + key.slice(1)}</span>`)
+      tab.type = 'button'
+      tab.addEventListener('click', () => {
+        tabs.querySelectorAll('.tab').forEach((t) => t.classList.toggle('on', t === tab))
+        Object.entries(panes).forEach(([k, pane]) => { pane.hidden = k !== key })
+        root.closest('.screen-scroll')?.scrollTo(0, 0)
+      })
+      tab.classList.toggle('on', i === 0)
+      tabs.appendChild(tab)
+    })
+    panes.gallery.hidden = true
+    const wrap = el('div', 'tab-panel boot')
+    wrap.append(panes.description, panes.gallery)
+    root.append(tabs, wrap)
+    body = panes.description
+  }
+
   const paras = Array.isArray(project.description) ? project.description : [project.description]
   const descBlock = el('div', 'desc-block boot')
   paras.forEach((p) => descBlock.appendChild(el('p', 'desc', esc(p))))
-  root.appendChild(descBlock)
+  body.appendChild(descBlock)
 
   const tags = el('div', 'tags boot')
   ;(project.stack ?? project.tech).forEach((t) => tags.appendChild(el('span', null, esc(t))))
-  root.appendChild(tags)
+  body.appendChild(tags)
 
   if (project.snippet) {
     const sn = project.snippet
-    if (sn.caption) root.appendChild(el('p', 'snippet-note boot', esc(sn.caption)))
+    if (sn.caption) body.appendChild(el('p', 'snippet-note boot', esc(sn.caption)))
     const editor = el('div', 'editor boot')
     const bar = el('div', 'editor-bar', '<i></i><i></i><i></i>')
     bar.appendChild(el('span', 'editor-title', esc(sn.title)))
@@ -80,7 +152,7 @@ export function buildFeatured(project, deco) {
     const pre = el('pre')
     pre.innerHTML = highlight(sn.code, sn.lang) + '<span class="caret"></span>'
     editor.appendChild(pre)
-    root.appendChild(editor)
+    body.appendChild(editor)
   }
 
   if (project.notes?.length) {
@@ -89,18 +161,36 @@ export function buildFeatured(project, deco) {
     const ul = el('ul')
     project.notes.forEach((n) => ul.appendChild(el('li', null, esc(n))))
     notes.appendChild(ul)
-    root.appendChild(notes)
+    body.appendChild(notes)
   }
 
-  if (project.links?.length) {
-    const links = el('div', 'screen-links boot')
-    project.links.forEach(({ label, href }) => {
-      const a = el('a', null, esc(label) + ' ↗')
-      a.href = href
-      if (href.startsWith('http')) { a.target = '_blank'; a.rel = 'noreferrer' }
-      links.appendChild(a)
+  // Links with a `logo` are press coverage: shown as clickable logo cards.
+  const press = project.links?.filter((l) => l.logo) ?? []
+  const links = project.links?.filter((l) => !l.logo) ?? []
+
+  if (links.length) {
+    const row = el('div', 'screen-links boot')
+    links.forEach(({ label, href }) => row.appendChild(linkEl(href, esc(label) + '<span class="arrow">↗</span>')))
+    body.appendChild(row)
+  }
+
+  if (press.length) {
+    const block = el('div', 'press boot')
+    block.appendChild(el('p', 'notes-label', 'Featured in'))
+    const row = el('div', 'press-row')
+    press.forEach(({ label, href, logo }) => {
+      const a = linkEl(href, '<span class="arrow">↗</span>', 'press-card')
+      a.title = label
+      const img = el('img')
+      img.src = logo
+      img.alt = label
+      // logo file not added yet: fall back to the outlet's name as text
+      img.onerror = () => img.replaceWith(el('span', 'press-name', esc(label)))
+      a.prepend(img)
+      row.appendChild(a)
     })
-    root.appendChild(links)
+    block.appendChild(row)
+    body.appendChild(block)
   }
 
   return root

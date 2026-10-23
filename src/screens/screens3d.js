@@ -57,7 +57,12 @@ export function createScreens(cssScene, monitors, content, onProjectSelect) {
   // While a monitor is focused, the wheel scrolls the content inside its
   // screen; the page (camera dolly) only takes over again once that content
   // is at its top/bottom edge. Non-passive so we can preventDefault.
+  // Reaching the edge holds the page for a brief beat (so the content visibly
+  // lands at its end), then any continued scrolling flows on into the dolly —
+  // the user never has to stop and start a new gesture to move on.
+  const EDGE_PAUSE_MS = 250
   let activeScroller = null
+  let lockUntil = 0
   window.addEventListener(
     'wheel',
     (e) => {
@@ -66,9 +71,14 @@ export function createScreens(cssScene, monitors, content, onProjectSelect) {
       const delta = e.deltaMode === 1 ? e.deltaY * 32 : e.deltaY
       const max = sc.scrollHeight - sc.clientHeight
       if (max <= 0) return
-      if ((delta > 0 && sc.scrollTop < max - 1) || (delta < 0 && sc.scrollTop > 0)) {
+      const canScroll = (delta > 0 && sc.scrollTop < max - 1) || (delta < 0 && sc.scrollTop > 0)
+      if (canScroll) {
         e.preventDefault()
         sc.scrollTop = Math.max(0, Math.min(max, sc.scrollTop + delta))
+        const atEdge = delta > 0 ? sc.scrollTop >= max - 1 : sc.scrollTop <= 0
+        if (atEdge) lockUntil = performance.now() + EDGE_PAUSE_MS
+      } else if (performance.now() < lockUntil) {
+        e.preventDefault()
       }
     },
     { passive: false }
@@ -84,6 +94,7 @@ export function createScreens(cssScene, monitors, content, onProjectSelect) {
       elem.classList.toggle('focus', focus === waypointIndex)
     })
     activeScroller = screens.find((s) => s.focus === waypointIndex)?.scroller ?? null
+    lockUntil = 0
     if (waypointIndex === 3) terminal.play?.()
   }
 

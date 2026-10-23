@@ -8,9 +8,12 @@
 //   description          — array of paragraphs for the featured screen
 //   tech                 — short list shown in the project-list row
 //   stack                — full stack shown as tags on the featured screen
-//   snippet              — { title, lang, caption, code } for the fake editor
 //   notes                — "Engineering notes" bullets
-//   links                — [{ label, href }] — TODO: add live/source links
+//   links                — [{ label, href, logo? }] — a `logo` (file in
+//                          public/press/) shows the link as a press logo card
+//   gallery (optional)   — [{ src, caption? }] — adds Description / Gallery
+//                          tabs; drop files in public/gallery/<project>/ and
+//                          reference them as '/gallery/<project>/file.jpg'
 // ---------------------------------------------------------------------------
 
 export const content = {
@@ -30,57 +33,35 @@ export const content = {
       role: 'Co-Founder & Lead Engineer · AR Smart Glasses',
       line: 'AR smart glasses — AI fully on-device',
       description: [
-        'Halion Technologies LLC is a startup I co-founded building AR smart glasses. ' +
-          'HalOS is the custom operating system I built for them. ' +
-          'simple idea: glasses that remember things for you and let you ask ' +
-          'them questions, with everything running locally on the device. No ' +
-          'phone, no cloud, no internet dependency. I built the application ' +
-          'layer end-to-end and led the (in-progress) effort to replace its ' +
-          'stock Linux base with a custom-built OS.',
-        'The shipping demo — built for AWE 2026 runs entirely on an Orange Pi 5 with a ' +
-          'hard 4GB RAM ceiling. A USB camera feeds a custom-trained YOLOv8 ' +
-          'model (ONNX Runtime) that tracks everyday objects like a wallet ' +
-          'and remembers where they were last seen. A local LLM ' +
-          '(via llama.cpp) answers questions and manages a ' +
-          'persistent to-do list and calendar, all rendered as a see-through ' +
-          'HUD directly on the framebuffer. Detection, inference, and ' +
-          'rendering all run on-device in real time with no cloud fallback.',
+        'Halion Technologies is a startup I co-founded building AR smart ' +
+          'glasses that remember things for you and answer questions, with ' +
+          'everything running locally on the device. No phone, no cloud.',
+        'I built HalOS, the software layer behind the glasses: on-device ' +
+          'object tracking, a local LLM assistant, and a see-through HUD, all ' +
+          'running in real time on an RK3588. We demoed it at AWE 2026.',
       ],
       tech: ['C++', 'Embedded Linux', 'Local LLM'],
-      stack: [
-        'C++17', 'OpenCV', 'ONNX Runtime', 'llama.cpp', 'SQLite', 'libcurl',
-        'Linux framebuffer', 'Orange Pi 5 (RK3588S)',
-      ],
-      snippet: {
-        title: 'halion.cpp — LLM command-protocol parser',
-        lang: 'cpp',
-        caption:
-          'The assistant parses structured commands (ADD_TODO:, ADD_EVENT:, …) ' +
-          'out of free-form LLM output reliably enough to run unattended at a ' +
-          'trade show booth. This exists because of a real bug: the 1.5B model ' +
-          'started emitting mixed-case tokens (Done_TODO) that silently broke ' +
-          'an earlier case-sensitive parser.',
-        code: `auto grab = [](const std::string& s, const char* tok) -> std::string {
-    std::string ls = lower(s), lt = lower(tok);   // case-insensitive
-    size_t p = ls.find(lt);
-    if (p == std::string::npos) return std::string();
-    size_t qq = p + lt.size();
-    while (qq < s.size() && (s[qq] == ':' || s[qq] == '-' ||
-                             s[qq] == '*' || s[qq] == ' ')) ++qq;
-    size_t e = s.find('\\n', qq);
-    std::string out = s.substr(qq, e == std::string::npos
-                                   ? std::string::npos : e - qq);
-    out.erase(std::remove(out.begin(), out.end(), '*'), out.end());
-    return trim(out);
-};`,
-      },
+      stack: ['C++17', 'OpenCV', 'ONNX Runtime', 'llama.cpp', 'RK3588'],
       notes: [
-        'Diagnosed and worked around a hard OpenCV/ONNX Runtime incompatibility with YOLOv8 on the target board',
-        'Designed the intent-routing system to fast-path obvious commands (add/done/delete) locally without hitting the LLM at all, keeping latency low on constrained hardware',
-        "Debugged a custom Buildroot OS boot failure down to a partition-layout mismatch between Ubuntu's U-Boot and a GPT-based image — part of an in-progress effort to replace the stock OS entirely",
-        'Presented the working demo at AWE 2026; follow-up interest from Samsung resulted in a formal hardware/software spec document',
+        'Presented the working demo at AWE 2026',
+        'Covered by the Charlotte Business Journal and Yahoo Tech',
       ],
-      links: [{ label: 'Site', href: 'https://haliontech.com' }],
+      links: [
+        { label: 'Site', href: 'https://haliontech.com' },
+        {
+          label: 'Charlotte Business Journal',
+          href: 'https://www.bizjournals.com/charlotte/news/2026/08/26/teens-ar-glasses-startup-halion-tech.html',
+          logo: '/press/charlotte-business-journal.png',
+        },
+        {
+          label: 'Yahoo Tech',
+          href: 'https://tech.yahoo.com/ar-vr/articles/charlotte-teens-launch-ap-startup-103643324.html',
+          logo: '/press/yahoo-tech.svg',
+        },
+      ],
+      gallery: [
+        // { src: '/gallery/halion/awe-booth.jpg', caption: 'AWE 2026 demo booth' },
+      ],
     },
     {
       name: 'AKTSA Showcase Platform',
@@ -102,41 +83,6 @@ export const content = {
         'Supabase (PostgreSQL)', 'JWT auth (jose + bcryptjs)',
         'Upstash Redis', 'Three.js',
       ],
-      snippet: {
-        title: 'LiquidEther.tsx — advection fragment shader',
-        lang: 'glsl',
-        caption:
-          "The site's background is a real incompressible-fluid solver " +
-          'built directly on Three.js primitives, including BFECC ' +
-          '(back-and-forth error compensation) advection to ' +
-          'cancel the first-order error a naive semi-Lagrangian velocity step ' +
-          'would introduce.',
-        code: `precision highp float;
-uniform sampler2D velocity;
-uniform float dt;
-uniform bool isBFECC;
-uniform vec2 fboSize;
-varying vec2 uv;
-void main(){
-  vec2 ratio = max(fboSize.x, fboSize.y) / fboSize;
-  if(isBFECC == false){
-    vec2 vel = texture2D(velocity, uv).xy;
-    vec2 uv2 = uv - vel * dt * ratio;
-    gl_FragColor = vec4(texture2D(velocity, uv2).xy, 0.0, 0.0);
-  } else {
-    vec2 spot_new = uv;
-    vec2 vel_old = texture2D(velocity, uv).xy;
-    vec2 spot_old = spot_new - vel_old * dt * ratio;
-    vec2 vel_new1 = texture2D(velocity, spot_old).xy;
-    vec2 spot_new2 = spot_old + vel_new1 * dt * ratio;
-    vec2 error = spot_new2 - spot_new;
-    vec2 spot_new3 = spot_new - error / 2.0;
-    vec2 vel_2 = texture2D(velocity, spot_new3).xy;
-    vec2 spot_old2 = spot_new3 - vel_2 * dt * ratio;
-    gl_FragColor = vec4(texture2D(velocity, spot_old2).xy, 0.0, 0.0);
-  }
-}`,
-      },
       notes: [
         'Built role-based authorization (teams / officers / admins) entirely at the API layer using a service-role Supabase client — bypassing RLS meant authorization had to be enforced deliberately in application code',
         'Added production-grade resilience most projects this size skip: structured logging, request timing, retry/timeout handling, and a circuit breaker across every API route',
@@ -162,56 +108,6 @@ void main(){
         'Supabase (PostgreSQL + Auth + RLS)', 'PL/pgSQL', 'Framer Motion',
         'FTCScout API',
       ],
-      snippet: {
-        title: 'calculate_elo_change() — rating engine as a DB function',
-        lang: 'sql',
-        caption:
-          'Rather than duplicating rating logic across client and server, the ' +
-          'entire ELO system — difficulty-weighted gains, diminishing returns ' +
-          'at high skill, a floor to prevent dead zero-change results — lives ' +
-          'as a pure PL/pgSQL function.',
-        code: `CREATE OR REPLACE FUNCTION calculate_elo_change(
-  current_elo INTEGER,
-  is_correct BOOLEAN,
-  difficulty TEXT,
-  k_factor INTEGER DEFAULT 32
-) RETURNS INTEGER AS $$
-DECLARE
-  difficulty_multiplier DECIMAL;
-  base_change INTEGER;
-  final_change INTEGER;
-BEGIN
-  CASE difficulty
-    WHEN 'easy' THEN difficulty_multiplier := 0.8;
-    WHEN 'medium' THEN difficulty_multiplier := 1.0;
-    WHEN 'hard' THEN difficulty_multiplier := 1.3;
-    ELSE difficulty_multiplier := 1.0;
-  END CASE;
-
-  IF is_correct THEN
-    base_change := ROUND(k_factor * difficulty_multiplier * 0.5);
-  ELSE
-    base_change := -ROUND(k_factor * (2.0 - difficulty_multiplier) * 0.5);
-  END IF;
-
-  IF current_elo > 1800 THEN
-    final_change := ROUND(base_change * 0.7);
-  ELSIF current_elo > 1500 THEN
-    final_change := ROUND(base_change * 0.85);
-  ELSE
-    final_change := base_change;
-  END IF;
-
-  IF final_change = 0 AND is_correct THEN
-    final_change := 1;
-  ELSIF final_change = 0 AND NOT is_correct THEN
-    final_change := -1;
-  END IF;
-
-  RETURN final_change;
-END;
-$$ LANGUAGE plpgsql;`,
-      },
       notes: [
         'Designed the daily ranked quiz to be fair and non-repeating: the same 10 questions are lazily generated for every student on a given day and excluded from the prior 7 days, while practice mode shuffles freely',
         'Found and fixed a production data-consistency bug where a client-visible ELO rating diverged from the correctly-updated peak rating due to a multi-step write sequencing issue — diagnosed the root cause and reconciled the data',
@@ -242,78 +138,52 @@ $$ LANGUAGE plpgsql;`,
         'Java', 'FTC SDK', 'Pedro Pathing', 'FTCLib/SolversLib PID',
         'Limelight 3A', 'goBILDA Pinpoint odometry', 'FTC Dashboard',
       ],
-      snippet: {
-        title: 'RegressionFitter.java — least-squares polynomial fit',
-        lang: 'java',
-        caption:
-          'Rather than deriving a closed-form ballistic equation for the ' +
-          'launcher (hard to model exactly on a real flywheel/hood system), I ' +
-          'measured RPM and hood-angle at fixed distances on the field and ' +
-          'built a from-scratch least-squares polynomial fitter with Gaussian ' +
-          'elimination and partial pivoting to fit a curve to that data.',
-        code: `private double[] fit(double[] x, double[] y, int degree) {
-    int n = x.length;
-    int p = degree + 1;
-
-    double[][] X = new double[n][p];
-    for (int i = 0; i < n; i++) {
-        X[i][0] = 1.0;
-        for (int j = 1; j < p; j++) {
-            X[i][j] = Math.pow(x[i], j);
-        }
-    }
-
-    double[][] XtX = matrixMultiply(transpose(X), X);
-
-    double[] Xty = new double[p];
-    for (int i = 0; i < p; i++) {
-        for (int j = 0; j < n; j++) {
-            Xty[i] += X[j][i] * y[j];
-        }
-    }
-
-    return solveLinearSystem(XtX, Xty);
-}
-
-private double[] solveLinearSystem(double[][] A, double[] b) {
-    int n = b.length;
-    double[][] aug = new double[n][n + 1];
-    for (int i = 0; i < n; i++) {
-        System.arraycopy(A[i], 0, aug[i], 0, n);
-        aug[i][n] = b[i];
-    }
-    for (int col = 0; col < n; col++) {
-        int pivot = col;
-        for (int row = col + 1; row < n; row++) {
-            if (Math.abs(aug[row][col]) > Math.abs(aug[pivot][col])) {
-                pivot = row;
-            }
-        }
-        double[] tmp = aug[col]; aug[col] = aug[pivot]; aug[pivot] = tmp;
-        for (int row = col + 1; row < n; row++) {
-            double f = aug[row][col] / aug[col][col];
-            for (int k = col; k <= n; k++) {
-                aug[row][k] -= f * aug[col][k];
-            }
-        }
-    }
-    double[] x = new double[n];
-    for (int i = n - 1; i >= 0; i--) {
-        x[i] = aug[i][n];
-        for (int j = i + 1; j < n; j++) {
-            x[i] -= aug[i][j] * x[j];
-        }
-        x[i] /= aug[i][i];
-    }
-    return x;
-}`,
-      },
       notes: [
         'Built a dual vision-tracking strategy (SDK AprilTag pipeline vs. Limelight) and benchmarked both before standardizing on the Limelight path for its simpler onboard distance/bearing output',
         'Designed the autonomous routine as a state machine (not a linear script) so the robot can react to real-world timing variance mid-match — e.g. breaking off intake early if a sensor reports the sorter is full',
         '~8,850 lines of custom Java, running entirely on a single onboard control computer with no server or backend',
       ],
       links: [],
+      gallery: [
+        // { src: '/gallery/cybotz/robot.jpg', caption: 'DECODE robot' },
+      ],
+    },
+    {
+      name: 'Freelance & Tech Consulting',
+      role: 'Freelance Software Developer · Tech Repair Consultant',
+      line: 'Client web apps, business sites & hardware repair',
+      description: [
+        'I take on freelance software work for small businesses and ' +
+          'organizations, keeping 2–3 projects in the pipeline at a time. That ' +
+          'ranges from internal tools to public-facing sites: for an ' +
+          'electronics shop I built an internal inventory app to track their ' +
+          'parts and equipment, plus a storefront site for listing products ' +
+          'for sale. I have also shipped a barber booking site and business ' +
+          'sites for roofing, HVAC, car detailing, and esthetics clients.',
+        'Currently in progress: EarlyPulse, a cost-effective way for ' +
+          'underprivileged people to get their vitals reviewed by licensed ' +
+          'professionals. I set up and run the backend on a self-hosted Ubuntu ' +
+          'server, connected to the web app through Prisma and Cloudflare.',
+        'On the hardware side, I do tech repair for individuals: laptop ' +
+          'repairs, custom PC builds, phone screen replacements, cameras, and ' +
+          'gaming consoles. Email me with what you need.',
+      ],
+      tech: ['Next.js', 'Supabase', 'Linux'],
+      stack: [
+        'Next.js', 'React', 'Supabase', 'Prisma', 'Ubuntu Server',
+        'Cloudflare', 'Linux',
+      ],
+      snippet: null,
+      notes: [
+        'EarlyPulse (in progress) — self-hosted Ubuntu server wired to the web app through Prisma and Cloudflare, keeping hosting costs low for a service built for underserved patients',
+        'Electronics shop — internal inventory system for parts and owned equipment, plus a public site for listing products for sale',
+        'Business sites and booking — a barber booking site and front-end sites for roofing, HVAC, car detailing, and esthetics businesses',
+        'Tech repair — laptop repair, custom PC builds, phone screen replacement, camera and gaming console repair for individual clients',
+      ],
+      links: [
+        { label: 'EarlyPulse', href: 'https://earlypulse.org' },
+        { label: 'Email', href: 'mailto:rautaarya23@gmail.com' },
+      ],
     },
     {
       name: 'Security & Systems',
@@ -337,7 +207,6 @@ private double[] solveLinearSystem(double[][] A, double[] b) {
         'OPNsense', 'WireGuard', 'Raspberry Pi', 'P4wnP1 A.L.O.A.',
         'Pwnagotchi', 'Kali Linux',
       ],
-      snippet: null,
       notes: [
         'OPNsense router — configured and running as the primary router for my home network, handling routing, firewall rules, and traffic monitoring in place of a stock consumer router',
         'Raspberry Pi VPN gateway — a Pi 3B+ configured as a custom access point running a WireGuard VPN, giving encrypted routing for connected devices',
@@ -346,6 +215,9 @@ private double[] solveLinearSystem(double[][] A, double[] b) {
         'Kali Linux home lab — a maintained environment for practicing penetration-testing tools and techniques',
       ],
       links: [],
+      gallery: [
+        // { src: '/gallery/security/opnsense-router.jpg', caption: 'OPNsense router' },
+      ],
     },
   ],
 
