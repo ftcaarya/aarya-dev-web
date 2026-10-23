@@ -1,10 +1,10 @@
 import { content } from './content.js'
-import { pickMode, renderFallback, renderMobile } from './fallback.js'
+import { pickMode, renderFallback } from './fallback.js'
 
 const mode = pickMode()
 
 if (mode === 'mobile') {
-  renderMobile(content)
+  import('./mobile/experience.js').then(({ startMobile }) => startMobile(content))
 } else if (mode === 'flat') {
   renderFallback(content)
 } else {

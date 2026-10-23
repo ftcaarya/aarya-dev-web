@@ -14,11 +14,17 @@
 //   gallery (optional)   — [{ src, caption? }] — adds Description / Gallery
 //                          tabs; drop files in public/gallery/<project>/ and
 //                          reference them as '/gallery/<project>/file.jpg'
+//   app                  — { label, icon, tint } for the phone home screen
+//                          (mobile). icon is a name from mobile/icons.js
 // ---------------------------------------------------------------------------
 
 export const content = {
   name: 'Aarya Raut',
   role: 'Software Engineer',
+
+  // Resume PDF for the phone's Resume app: put the file in public/ and set
+  // e.g. '/resume.pdf'. null shows "available on request" with an email link.
+  resume: null,
 
   // Shared dressing for the featured screen (monitor 1, left)
   featured: {
@@ -30,6 +36,7 @@ export const content = {
   projects: [
     {
       name: 'Halion Technologies',
+      app: { label: 'Halion', icon: 'glasses', tint: '#8ecbdf' },
       role: 'Co-Founder & Lead Engineer · AR Smart Glasses',
       line: 'AR smart glasses — AI fully on-device',
       description: [
@@ -75,6 +82,7 @@ export const content = {
     },
     {
       name: 'Freelance & Tech Consulting',
+      app: { label: 'Freelance', icon: 'briefcase', tint: '#d8b48a' },
       role: 'Freelance Software Developer · Tech Repair Consultant',
       line: 'Client web apps, business sites & hardware repair',
       description: [
@@ -112,6 +120,7 @@ export const content = {
     },
     {
       name: 'FTC Programming',
+      app: { label: 'FTC', icon: 'robot', tint: '#8fd8b4' },
       role: 'Lead Programmer · 4 FIRST Tech Challenge seasons · 3 teams',
       line: 'Control, localization & pathing for competition robots',
       description: [
@@ -181,6 +190,7 @@ export const content = {
     },
     {
       name: 'AKTSA Showcase Platform',
+      app: { label: 'AKTSA', icon: 'trophy', tint: '#a9a3e8' },
       role: 'Full-Stack Developer',
       line: 'Conference submission & grading platform',
       description: [
@@ -217,6 +227,7 @@ export const content = {
     },
     {
       name: 'FTC Quiz Clash',
+      app: { label: 'Quiz Clash', icon: 'bolt', tint: '#e8c84a' },
       role: 'Full-Stack Developer · Adopted by FTC teams internationally',
       line: 'Daily ranked quiz with a chess-style ELO',
       description: [
@@ -249,6 +260,7 @@ export const content = {
     },
     {
       name: 'FBLA Elevate',
+      app: { label: 'FBLA', icon: 'chart', tint: '#7fb2f0' },
       role: 'Freelance Developer · Built for founder Shourya Bangaru',
       line: 'Competition prep platform for FBLA events',
       description: [
@@ -279,6 +291,7 @@ export const content = {
     },
     {
       name: 'Security & Systems',
+      app: { label: 'Security', icon: 'shield', tint: '#e89a9a' },
       role: 'Home Lab · Network Security · Embedded Linux',
       line: 'Networking & security home lab',
       description: [

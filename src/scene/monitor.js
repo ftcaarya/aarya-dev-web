@@ -24,7 +24,9 @@ const standMaterial = new THREE.MeshPhysicalMaterial({
 
 // Builds one monitor. The group's origin is the CENTER OF THE SCREEN so the
 // CSS3D screen and camera framing can use cfg.pos directly.
-export function createMonitor(cfg) {
+// `asleep` (phone scene): no DOM screen goes on top, so the panel shows a dim
+// standby tint instead of full glow, and the bounce light is skipped.
+export function createMonitor(cfg, { asleep = false } = {}) {
   const group = new THREE.Group()
   group.position.set(...cfg.pos)
   group.rotation.y = cfg.rotY
@@ -59,7 +61,7 @@ export function createMonitor(cfg) {
   const glow = new THREE.Mesh(
     new THREE.PlaneGeometry(cfg.w, cfg.h),
     new THREE.MeshBasicMaterial({
-      color: new THREE.Color(cfg.accent).multiplyScalar(1.1),
+      color: new THREE.Color(cfg.accent).multiplyScalar(asleep ? 0.012 : 1.1),
       toneMapped: false,
     })
   )
@@ -82,10 +84,13 @@ export function createMonitor(cfg) {
   group.add(foot)
 
   // Screen-colored bounce light onto the desk/keyboard
-  const bounce = new THREE.RectAreaLight(cfg.accent, 0.7, cfg.w, cfg.h)
-  bounce.position.z = 0.002
-  bounce.rotation.y = Math.PI // RectAreaLight emits along -z; flip to face outward
-  group.add(bounce)
+  let bounce = null
+  if (!asleep) {
+    bounce = new THREE.RectAreaLight(cfg.accent, 0.7, cfg.w, cfg.h)
+    bounce.position.z = 0.002
+    bounce.rotation.y = Math.PI // RectAreaLight emits along -z; flip to face outward
+    group.add(bounce)
+  }
 
   // World-space screen normal (monitors only rotate about Y)
   const normal = new THREE.Vector3(Math.sin(cfg.rotY), 0, Math.cos(cfg.rotY))

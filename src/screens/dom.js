@@ -1,14 +1,14 @@
 // Shared DOM builders for screen content. Used both by the CSS3D screens in
 // the 3D scene and by the stacked fallback layout — keep them context-free.
 
-function el(tag, className, html) {
+export function el(tag, className, html) {
   const node = document.createElement(tag)
   if (className) node.className = className
   if (html != null) node.innerHTML = html
   return node
 }
 
-function esc(s) {
+export function esc(s) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
@@ -51,7 +51,7 @@ function highlight(code, lang) {
   return out + esc(code.slice(last))
 }
 
-function linkEl(href, html, className) {
+export function linkEl(href, html, className) {
   const a = el('a', className, html)
   a.href = href
   if (href.startsWith('http')) { a.target = '_blank'; a.rel = 'noreferrer' }
