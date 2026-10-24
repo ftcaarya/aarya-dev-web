@@ -48,11 +48,15 @@ export function createHomeTexture(content, apps) {
   function drawApp(app, cx, top, size) {
     const img = icons.get(app.id)
     if (img.complete && img.naturalWidth) ctx.drawImage(img, cx - size / 2, top, size, size)
-    ctx.fillStyle = '#e8e6e1'
+    ctx.fillStyle = '#f2f1ee'
     ctx.font = `500 ${HOME.grid.label * W}px ${FONT}`
     ctx.textAlign = 'center'
     ctx.textBaseline = 'top'
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)'
+    ctx.shadowBlur = 4
+    ctx.shadowOffsetY = 1
     ctx.fillText(app.label, cx, top + size + HOME.grid.labelGap * W)
+    ctx.shadowColor = 'transparent'
   }
 
   function draw() {
@@ -126,12 +130,13 @@ export function createHomeTexture(content, apps) {
     ctx.fillText('Tap an app to explore', tx, ay + W * 0.05)
 
     // app grid
-    const cellW = (W - pad * 2) / HOME.grid.cols
+    const gi = HOME.grid.inset * W
+    const cellW = (W - gi * 2) / HOME.grid.cols
     const size = HOME.grid.icon * W
     apps.grid.forEach((app, i) => {
       const col = i % HOME.grid.cols
       const row = Math.floor(i / HOME.grid.cols)
-      drawApp(app, pad + cellW * (col + 0.5), (HOME.grid.top + row * HOME.grid.row) * W, size)
+      drawApp(app, gi + cellW * (col + 0.5), (HOME.grid.top + row * HOME.grid.row) * W, size)
     })
 
     // dock, on the bottom edge of the visible window

@@ -163,8 +163,8 @@ export function appList(content) {
     grid: [...projects, app('resume', 'Resume', 'resume', '#d8d4c8', 'Resume', () => buildResume(content))],
     dock: [
       app('photos', 'Photos', 'photos', '#f0b37e', 'Photos', (ctx) => buildPhotos(content, ctx)),
-      app('mail', 'Contact', 'mail', '#8ecbdf', 'Contact', () => buildMail(content)),
-      app('terminal', 'Terminal', 'terminal', '#8fd8b4', 'Terminal', () => buildTerminalApp(content)),
+      app('mail', 'Contact', 'mail', '#5fa8f5', 'Contact', () => buildMail(content)),
+      app('terminal', 'Terminal', 'terminal', '#9ba3ad', 'Terminal', () => buildTerminalApp(content)),
       app('press', 'Press', 'press', '#a9a3e8', 'Press', () => buildPress(content)),
     ],
   }

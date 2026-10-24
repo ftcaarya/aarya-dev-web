@@ -659,8 +659,8 @@ body.phone-mode .hero { top: 8vh; }
 .ph-grid {
   position: absolute;
   top: var(--grid-top);
-  left: var(--pad);
-  right: var(--pad);
+  left: var(--grid-inset);
+  right: var(--grid-inset);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-auto-rows: var(--row);
@@ -676,7 +676,13 @@ body.phone-mode .hero { top: 8vh; }
   font: inherit;
   cursor: pointer;
 }
-.ph-icon { display: block; width: var(--icon); height: var(--icon); transition: transform 0.15s ease; }
+.ph-icon {
+  display: block;
+  width: var(--icon);
+  height: var(--icon);
+  filter: drop-shadow(0 0.6cqw 1.4cqw rgba(0, 0, 0, 0.35));
+  transition: transform 0.15s ease;
+}
 .ph-icon svg { display: block; width: 100%; height: 100%; }
 .ph-app:active .ph-icon { transform: scale(0.9); }
 .ph-label {
@@ -685,6 +691,8 @@ body.phone-mode .hero { top: 8vh; }
   font-weight: 500;
   line-height: 1;
   white-space: nowrap;
+  color: #f2f1ee;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
 }
 
 .ph-hint {
@@ -711,6 +719,7 @@ body.phone-mode .hero { top: 8vh; }
   padding-top: var(--dock-icon-top);
   border-radius: var(--dock-r);
   background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .ph-indicator {
