@@ -31,6 +31,7 @@ export function startMobile(content) {
 
   import('./scene.js').then(({ startPhoneScene }) => {
     startPhoneScene(content, apps, {
+      frozen: ui.isBusy,
       onProgress(u) {
         const fade = String(Math.max(0, 1 - u * 4))
         hero.forEach((n) => { n.style.opacity = fade })

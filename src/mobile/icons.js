@@ -54,6 +54,10 @@ const GLYPHS = {
     `<rect x="12" y="21" width="38" height="29" rx="5" ${P}/>` +
     `<circle cx="22" cy="30" r="3.4" fill="${ink}"/>` +
     `<path d="M15.5 46.5l10.5-10.5 7 6.5 5-4.5 9 8.5z" fill="${ink}" stroke="${ink}" stroke-width="1" stroke-linejoin="round"/>`,
+  // speech bubble with a typing indicator
+  messages: (ink) =>
+    `<path d="M32 13c11.6 0 21 7.6 21 17s-9.4 17-21 17c-2.4 0-4.7-.3-6.8-.9L15 50.5l2.6-8.6C13.5 38.8 11 34.6 11 30c0-9.4 9.4-17 21-17z" ${P}/>` +
+    `<circle cx="23.5" cy="30" r="2.8" fill="${ink}"/><circle cx="32" cy="30" r="2.8" fill="${ink}"/><circle cx="40.5" cy="30" r="2.8" fill="${ink}"/>`,
   mail: (ink) =>
     `<rect x="11" y="17" width="42" height="30" rx="6" ${P}/>` +
     `<path d="M14.5 21.5L32 34.5l17.5-13" ${line(ink, 3)}/>`,
@@ -77,7 +81,7 @@ const GLYPHS = {
 }
 
 // Superellipse |x|^5 + |y|^5 = 1 over the 64-unit canvas.
-const SQUIRCLE = (() => {
+export const SQUIRCLE = (() => {
   const n = 5
   const pts = []
   for (let i = 0; i < 96; i++) {
@@ -139,4 +143,40 @@ export function iconSvg(name, tint) {
     `<g filter="url(#${id}s)">${(GLYPHS[name] ?? GLYPHS.code)(ink)}</g>` +
     `</svg>`
   )
+}
+
+// CSS mask in the same squircle, for icons made from an image
+export const SQUIRCLE_MASK = `url("data:image/svg+xml,${encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="${SQUIRCLE}"/></svg>`
+)}")`
+
+// An app's icon: always a drawn SVG, plus an optional image ({ src, bg, pad })
+// that replaces it when the file loads.
+export function appIcon({ icon, tint, image }) {
+  return { svg: iconSvg(icon, tint), image: image ?? null }
+}
+
+// DOM node for an icon. Image icons fall back to the drawn SVG if the file
+// is missing.
+export function iconNode(ic, className = 'ph-icon') {
+  const node = document.createElement('span')
+  node.className = className
+  const drawn = () => { node.innerHTML = ic.svg }
+  if (!ic.image) {
+    drawn()
+    return node
+  }
+  const tile = document.createElement('span')
+  tile.className = 'ic-img'
+  tile.style.background = ic.image.bg ?? '#111'
+  tile.style.padding = `${(ic.image.pad ?? 0) * 100}%`
+  const img = new Image()
+  img.alt = ''
+  img.decoding = 'async'
+  img.style.objectFit = ic.image.pad ? 'contain' : 'cover'
+  img.onerror = drawn
+  img.src = ic.image.src
+  tile.appendChild(img)
+  node.appendChild(tile)
+  return node
 }

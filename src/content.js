@@ -14,8 +14,11 @@
 //   gallery (optional)   — [{ src, caption? }] — adds Description / Gallery
 //                          tabs; drop files in public/gallery/<project>/ and
 //                          reference them as '/gallery/<project>/file.jpg'
-//   app                  — { label, icon, tint } for the phone home screen
-//                          (mobile). icon is a name from mobile/icons.js
+//   app                  — { label, icon, tint, image? } for the phone home
+//                          screen (mobile). icon is a name from
+//                          mobile/icons.js, used if `image` is missing.
+//                          image: { src, bg?, pad? } — a file in
+//                          public/icons/; pad (0–0.3) insets a logo on bg
 // ---------------------------------------------------------------------------
 
 export const content = {
@@ -25,6 +28,70 @@ export const content = {
   // Resume PDF for the phone's Resume app: put the file in public/ and set
   // e.g. '/resume.pdf'. null shows "available on request" with an email link.
   resume: null,
+
+  // Phone (mobile) experience
+  phone: {
+    // Lock + home screen wallpaper, e.g. '/wallpaper.jpg' (in public/).
+    // null uses the built-in dark gradient.
+    wallpaper: null,
+
+    // Lock screen notifications, newest first. `open` is the app to open
+    // when tapped (an app label, lowercased: 'press', 'ftc', 'halion', …).
+    notifications: [
+      {
+        title: 'Charlotte Business Journal',
+        body: 'Covered Halion Technologies, the AR smart-glasses startup I co-founded.',
+        when: 'Aug 26',
+        open: 'press',
+      },
+      {
+        title: 'Yahoo Tech',
+        body: 'Halion Technologies picked up by Yahoo Tech.',
+        open: 'press',
+      },
+      {
+        title: 'Carolinas Premier Event',
+        body: '2nd-place Inspire Award against 34 teams with Circuit Breakers 21829.',
+        when: 'Jul',
+        open: 'ftc',
+      },
+      {
+        title: 'AWE 2026',
+        body: 'Demoed HalOS live: on-device tracking, a local LLM, and a see-through HUD.',
+        open: 'halion',
+      },
+    ],
+
+    // Messages app: the opening thread, sent from you. Write these in your
+    // own voice; the visitor's reply opens their email app.
+    messages: [
+      "hey, I'm Aarya",
+      'I build things up and down the stack: on-device AI for AR glasses at Halion, web platforms for clients, and control software for FTC robots.',
+      'Got a project, a question, or a laptop that needs fixing? Send me a message here and it goes straight to my email.',
+    ],
+
+    // Quiz Clash app: a short quiz about you. `answer` is the option index.
+    quiz: [
+      {
+        q: "Where does the AI in Halion's glasses run?",
+        options: ['In the cloud', 'On the glasses', 'On a paired phone'],
+        answer: 1,
+        why: 'Everything runs locally on an RK3588. No phone, no cloud.',
+      },
+      {
+        q: 'What did Version Vegaz win at the CENTERSTAGE Raleigh qualifier?',
+        options: ['Inspire Award', 'Think Award', 'Control Award'],
+        answer: 2,
+        why: 'The Control Award goes to the best use of sensors and software.',
+      },
+      {
+        q: "How big is FBLA Elevate's question bank?",
+        options: ['~1,000', '~10,000', '~100,000'],
+        answer: 1,
+        why: 'A Raspberry Pi Zero 2 W scrapes and inserts them with no manual entry.',
+      },
+    ],
+  },
 
   // Shared dressing for the featured screen (monitor 1, left)
   featured: {
@@ -36,7 +103,7 @@ export const content = {
   projects: [
     {
       name: 'Halion Technologies',
-      app: { label: 'Halion', icon: 'glasses', tint: '#8ecbdf' },
+      app: { label: 'Halion', icon: 'glasses', tint: '#8ecbdf', image: { src: '/icons/halion.png', bg: '#ffffff', pad: 0.1 } },
       role: 'Co-Founder & Lead Engineer · AR Smart Glasses',
       line: 'AR smart glasses — AI fully on-device',
       description: [
@@ -120,7 +187,7 @@ export const content = {
     },
     {
       name: 'FTC Programming',
-      app: { label: 'FTC', icon: 'robot', tint: '#8fd8b4' },
+      app: { label: 'FTC', icon: 'robot', tint: '#8fd8b4', image: { src: '/icons/first.png', bg: '#ffffff', pad: 0.13 } },
       role: 'Lead Programmer · 4 FIRST Tech Challenge seasons · 3 teams',
       line: 'Control, localization & pathing for competition robots',
       description: [
@@ -144,6 +211,19 @@ export const content = {
           'robot fused a Limelight camera with wheel odometry for ' +
           'vision-corrected closed-loop targeting, so it kept aiming ' +
           'accurately even when it briefly lost sight of the goal.',
+      ],
+      // Season cards in the phone's FTC app
+      seasons: [
+        { name: 'CENTERSTAGE', years: '2023–24', team: 'Version Vegaz', number: '23241', results: ['Control Award · Raleigh qualifier', 'Alliance finalist'] },
+        { name: 'INTO THE DEEP', years: '2024–25', team: 'Circuit Breakers', number: '21829', results: ['Undefeated 5–0, #1 seed · Salem Academy qualifier', 'Winning alliance', 'Inspire Award · Pinnacle Classical', '5th · NC Championship', 'Top 7% of 7,600+ teams by OPR'] },
+        { name: 'DECODE', years: '2025–26', team: 'Cybotz', number: '21351', results: ['Think Award · NC Championship', 'Inspire Award · TMSA qualifier', 'Alliance finalist · Southeast Guilford'] },
+        { name: 'Carolinas Premier Event', years: 'July 2026', team: 'Circuit Breakers', number: '21829', results: ['2nd-place Inspire Award', 'Competed against 34 teams'] },
+        { name: 'BioBuzz', years: '2026–27', team: 'Circuit Breakers', number: '21829', results: ['Season in progress'] },
+      ],
+      stats: [
+        { value: '4', label: 'seasons' },
+        { value: '3', label: 'teams' },
+        { value: '8.8k', label: 'lines of Java (DECODE)' },
       ],
       tech: ['Java', 'Control Systems', 'Localization'],
       stack: [
@@ -260,7 +340,7 @@ export const content = {
     },
     {
       name: 'FBLA Elevate',
-      app: { label: 'FBLA', icon: 'chart', tint: '#7fb2f0' },
+      app: { label: 'FBLA', icon: 'chart', tint: '#7fb2f0', image: { src: '/icons/fbla.png', bg: '#ffffff', pad: 0.1 } },
       role: 'Freelance Developer · Built for founder Shourya Bangaru',
       line: 'Competition prep platform for FBLA events',
       description: [

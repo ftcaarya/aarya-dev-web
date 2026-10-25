@@ -5,15 +5,17 @@ import { createMonitor } from '../scene/monitor.js'
 import { createEnvironmentSet } from '../scene/desk.js'
 import { createLighting } from '../scene/lighting.js'
 import { createPhone } from '../scene/phone.js'
-import { createHomeTexture } from './home-texture.js'
+import { createLockTexture } from './lock-texture.js'
 
 const smootherstep = (x) => x * x * x * (x * (x * 6 - 15) + 10)
 const clamp01 = (x) => Math.min(1, Math.max(0, x))
 
-// Phone scene: the same desk, monitors asleep, a phone lying on it. Page
-// scroll (0..1) flies the camera from a wide shot straight down onto the
-// phone's screen; onProgress(u) lets the DOM phone UI fade in on arrival.
-export function startPhoneScene(content, apps, { onProgress }) {
+// Phone scene: the same desk, monitors asleep, a phone lying on it with its
+// screen off. Page scroll (0..1) flies the camera from a wide shot straight
+// down onto the phone; the screen wakes to its lock screen on the way in, and
+// onProgress(u) lets the DOM phone UI fade in on arrival. While frozen()
+// is true (an app is open) scroll changes are ignored.
+export function startPhoneScene(content, apps, { onProgress, frozen = () => false }) {
   const world = createWorld({ lite: true })
   const { camera } = world
   createLighting(world.scene)
@@ -22,8 +24,8 @@ export function startPhoneScene(content, apps, { onProgress }) {
   world.scene.add(env.group)
   MONITORS.forEach((cfg) => world.scene.add(createMonitor(cfg, { asleep: true }).group))
 
-  const home = createHomeTexture(content, apps)
-  const phone = createPhone(home.texture)
+  const lock = createLockTexture(content, apps)
+  const phone = createPhone(lock.texture)
   world.scene.add(phone.group)
 
   let path
@@ -42,7 +44,7 @@ export function startPhoneScene(content, apps, { onProgress }) {
     // (matching the top-anchored DOM layout) and tell the texture where that
     // window ends so its dock lands where the DOM dock will.
     const winH = Math.min(phone.h, phone.w / camera.aspect)
-    home.setWindow(winH / phone.h)
+    lock.setWindow(winH / phone.h)
     const look1 = phone.center.clone().addScaledVector(phone.top, (phone.h - winH) / 2)
     const d1 = Math.min(winH / 2 / tanV, phone.w / 2 / tanH) // cover the viewport
     const pos1 = look1.clone().add(new THREE.Vector3(0, d1, 0))
@@ -75,6 +77,7 @@ export function startPhoneScene(content, apps, { onProgress }) {
   // Smoothed page-scroll progress
   let target = 0
   function readScroll() {
+    if (frozen()) return
     const max = document.documentElement.scrollHeight - innerHeight
     target = max > 0 ? clamp01(scrollY / max) : 0
   }
@@ -82,11 +85,17 @@ export function startPhoneScene(content, apps, { onProgress }) {
   window.addEventListener('scroll', readScroll, { passive: true })
   let u = target
 
+  // Screen wakes (like raise-to-wake) once the camera is on its way in, and
+  // sleeps again near the wide shot; it fades over ~0.3 s either way.
+  let wake = 0
   const clock = new THREE.Clock()
   world.renderer.setAnimationLoop(() => {
     const dt = Math.min(clock.getDelta(), 0.1)
     u += (target - u) * Math.min(1, dt * 7)
     if (Math.abs(target - u) < 1e-4) u = target
+    const awake = u > 0.22 ? 1 : 0
+    wake += (awake - wake) * Math.min(1, dt * 9)
+    phone.setWake(wake * wake)
     const covered = onProgress(u)
     // once the DOM phone UI fully covers the canvas, stop drawing
     if (covered) return
